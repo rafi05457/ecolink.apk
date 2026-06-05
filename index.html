@@ -10,6 +10,8 @@
 <title>EcoLink — Aplikasi Warga</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 /* ===== RESET ===== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -24,6 +26,17 @@ body{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;color:#1A2E22;-we
   --sky:#5BA0B4;--sky-dark:#2A3D30;--lemon:#D4C050;
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
 }
+
+
+/* ===== LEAFLET OVERRIDES ===== */
+.leaflet-container{font-family:'Plus Jakarta Sans',sans-serif;}
+.leaflet-container img{max-width:none!important;margin:0;}
+.leaflet-control-zoom{border:none!important;box-shadow:0 2px 8px rgba(0,0,0,.18)!important;}
+.leaflet-control-zoom-in,.leaflet-control-zoom-out{width:30px!important;height:30px!important;line-height:30px!important;font-size:18px!important;color:#555!important;background:white!important;border-radius:8px!important;}
+.leaflet-control-zoom-in{border-radius:8px 8px 0 0!important;}
+.leaflet-control-zoom-out{border-radius:0 0 8px 8px!important;}
+.leaflet-attribution-flag{display:none!important;}
+.map-pin-drop{width:26px;height:26px;background:#e53935;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.35);margin-left:-3px;}
 
 /* ===== DEVICE WRAPPER ===== */
 #app-root{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#344C3D;}
@@ -149,7 +162,6 @@ textarea.input-field{resize:none;min-height:80px;}
 .qa-card:active{transform:scale(.96);box-shadow:0 2px 8px rgba(0,0,0,.08);}
 .qa-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;}
 .qa-ico.g{background:rgba(52,76,61,.12);}
-.qa-ico.c{background:rgba(52,76,61,.12);}
 .qa-ico.e{background:rgba(52,76,61,.15);}
 .qa-ico.b{background:rgba(52,76,61,.1);}
 .qa-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px;}
@@ -226,7 +238,6 @@ textarea.input-field{resize:none;min-height:80px;}
 .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .photo-thumb{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;}
 .map-wrap{border-radius:18px;overflow:hidden;border:1.5px solid var(--border);margin-bottom:14px;position:relative;cursor:crosshair;}
-.map-wrap svg{width:100%;display:block;}
 .loc-tabs{display:flex;gap:8px;flex-wrap:wrap;}
 .loc-tab{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;border:1.5px solid var(--border);color:var(--muted);background:var(--white);}
 .loc-tab.on{background:var(--leaf);border-color:var(--leaf);color:var(--ink);}
@@ -1267,85 +1278,14 @@ textarea.input-field{resize:none;min-height:80px;}
     <!-- INTERACTIVE MAP -->
     <div class="ig">
       <label class="input-label">Peta Lokasi — Klik untuk pilih titik</label>
-      <div class="map-wrap" id="interactive-map-wrap" style="position:relative;border-radius:18px;overflow:hidden;border:1.5px solid var(--border);margin-bottom:8px;cursor:crosshair;user-select:none;">
-        <svg id="interactive-map-svg" viewBox="0 0 390 240" style="width:100%;display:block;" xmlns="http://www.w3.org/2000/svg" onclick="handleMapClick(event)">
-          <!-- Base terrain -->
-          <rect width="390" height="240" fill="#e8f0e8"/>
-          <!-- Parks/green areas -->
-          <rect x="8" y="8" width="60" height="55" fill="#c8dfc8" rx="5"/>
-          <rect x="310" y="8" width="72" height="55" fill="#c8dfc8" rx="5"/>
-          <rect x="8" y="160" width="55" height="72" fill="#c8dfc8" rx="5"/>
-          <rect x="320" y="150" width="62" height="82" fill="#c8dfc8" rx="5"/>
-          <!-- Water body -->
-          <rect x="80" y="168" width="30" height="60" fill="#b8d4e8" rx="4"/>
-          <!-- Main horizontal roads -->
-          <rect x="0" y="75" width="390" height="24" fill="#f5f0e8"/>
-          <rect x="0" y="76" width="390" height="1" fill="#e0d8c8"/>
-          <rect x="0" y="98" width="390" height="1" fill="#e0d8c8"/>
-          <rect x="0" y="140" width="390" height="18" fill="#f5f0e8"/>
-          <rect x="0" y="141" width="390" height="1" fill="#e0d8c8"/>
-          <rect x="0" y="157" width="390" height="1" fill="#e0d8c8"/>
-          <rect x="0" y="200" width="390" height="20" fill="#f5f0e8"/>
-          <!-- Main vertical roads -->
-          <rect x="80" y="0" width="20" height="240" fill="#f5f0e8"/>
-          <rect x="81" y="0" width="1" height="240" fill="#e0d8c8"/>
-          <rect x="99" y="0" width="1" height="240" fill="#e0d8c8"/>
-          <rect x="195" y="0" width="22" height="240" fill="#f5f0e8"/>
-          <rect x="196" y="0" width="1" height="240" fill="#e0d8c8"/>
-          <rect x="216" y="0" width="1" height="240" fill="#e0d8c8"/>
-          <rect x="305" y="0" width="16" height="240" fill="#f5f0e8"/>
-          <rect x="306" y="0" width="1" height="240" fill="#e0d8c8"/>
-          <rect x="320" y="0" width="1" height="240" fill="#e0d8c8"/>
-          <!-- Buildings block A (top-left) -->
-          <rect x="108" y="10" width="80" height="60" fill="#d8d0c0" rx="5"/>
-          <rect x="113" y="15" width="70" height="50" fill="#ccc4b4" rx="3"/>
-          <!-- Buildings block B (top-right) -->
-          <rect x="225" y="10" width="74" height="60" fill="#d8d0c0" rx="5"/>
-          <rect x="230" y="15" width="64" height="50" fill="#ccc4b4" rx="3"/>
-          <!-- Buildings block C (mid-left) -->
-          <rect x="108" y="104" width="80" height="30" fill="#d8d0c0" rx="4"/>
-          <rect x="113" y="108" width="70" height="22" fill="#ccc4b4" rx="2"/>
-          <!-- Buildings block D (mid-right) -->
-          <rect x="225" y="104" width="74" height="30" fill="#d8d0c0" rx="4"/>
-          <rect x="230" y="108" width="64" height="22" fill="#ccc4b4" rx="2"/>
-          <!-- Buildings block E (bottom) -->
-          <rect x="108" y="164" width="80" height="40" fill="#d8d0c0" rx="5"/>
-          <rect x="113" y="168" width="70" height="32" fill="#ccc4b4" rx="3"/>
-          <rect x="225" y="164" width="74" height="40" fill="#d8d0c0" rx="5"/>
-          <rect x="230" y="168" width="64" height="32" fill="#ccc4b4" rx="3"/>
-          <!-- Road labels -->
-          <text x="206" y="91" font-size="8" fill="#8b7a62" text-anchor="middle" font-weight="bold" font-family="sans-serif">Jl. Pejanggik</text>
-          <text x="206" y="152" font-size="7" fill="#8b7a62" text-anchor="middle" font-family="sans-serif">Jl. Selaparang</text>
-          <text x="91" y="60" font-size="7" fill="#8b7a62" text-anchor="middle" font-family="sans-serif" transform="rotate(-90,91,60)">Jl. Langko</text>
-          <!-- Compass rose -->
-          <circle cx="362" cy="28" r="14" fill="white" opacity=".85"/>
-          <text x="362" y="22" font-size="9" fill="#344C3D" text-anchor="middle" font-weight="bold" font-family="sans-serif">N</text>
-          <text x="362" y="35" font-size="9" fill="#9E9E9E" text-anchor="middle" font-family="sans-serif">S</text>
-          <text x="352" y="30" font-size="9" fill="#9E9E9E" text-anchor="middle" font-family="sans-serif">W</text>
-          <text x="372" y="30" font-size="9" fill="#9E9E9E" text-anchor="middle" font-family="sans-serif">E</text>
-          <!-- Scale bar -->
-          <rect x="12" y="228" width="60" height="3" fill="#9E9E9E" rx="1"/>
-          <text x="12" y="225" font-size="7" fill="#666" font-family="sans-serif">0</text>
-          <text x="64" y="225" font-size="7" fill="#666" font-family="sans-serif">100m</text>
-          <!-- Draggable pin group -->
-          <g id="map-pin-group">
-            <circle id="map-pin-shadow" cx="206" cy="122" r="22" fill="#e53935" opacity=".15"/>
-            <circle id="map-pin-outer" cx="206" cy="112" r="14" fill="#e53935" opacity=".95"/>
-            <circle id="map-pin-inner" cx="206" cy="112" r="5.5" fill="white"/>
-            <line id="map-pin-line" x1="206" y1="126" x2="206" y2="132" stroke="#e53935" stroke-width="2" stroke-linecap="round"/>
-          </g>
-        </svg>
-        <!-- Map controls -->
-        <div style="position:absolute;top:10px;left:10px;display:flex;flex-direction:column;gap:6px;">
-          <div onclick="mapZoomIn()" style="width:30px;height:30px;background:white;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:700;color:#555;line-height:1;">+</div>
-          <div onclick="mapZoomOut()" style="width:30px;height:30px;background:white;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:700;color:#555;line-height:1;">−</div>
-        </div>
-        <div onclick="resetMapPin()" style="position:absolute;bottom:10px;right:10px;background:white;border-radius:20px;padding:5px 12px;box-shadow:0 2px 8px rgba(0,0,0,.18);font-size:11px;font-weight:700;color:#344C3D;cursor:pointer;display:flex;align-items:center;gap:5px;">
+      <div class="map-wrap" id="interactive-map-wrap" style="position:relative;border-radius:18px;overflow:hidden;border:1.5px solid var(--border);margin-bottom:8px;">
+        <div id="leaflet-map-container" style="width:100%;height:240px;background:#e8f0e8;"></div>
+        <div onclick="resetMapPin()" style="position:absolute;bottom:10px;right:10px;background:white;border-radius:20px;padding:5px 12px;box-shadow:0 2px 8px rgba(0,0,0,.18);font-size:11px;font-weight:700;color:#344C3D;cursor:pointer;display:flex;align-items:center;gap:5px;z-index:500;">
           <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Lokasi Saya
         </div>
       </div>
-      <!-- Pin coordinate info -->
+            <!-- Pin coordinate info -->
       <div id="map-pin-info" style="background:rgba(52,76,61,.07);border-radius:12px;padding:9px 13px;font-size:12px;color:var(--moss);font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:7px;">
         <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span id="map-pin-label">📍 Jl. Pejanggik No. 47, Mataram</span>
@@ -1496,59 +1436,7 @@ textarea.input-field{resize:none;min-height:80px;}
   <div class="qr-ttl">Pindai QR Code</div>
   <div class="qr-st">Tunjukkan kepada petugas untuk konfirmasi kehadiran</div>
   <div class="qr-box" onclick="event.stopPropagation()">
-    <svg viewBox="0 0 192 192" width="192" height="192" xmlns="http://www.w3.org/2000/svg">
-      <rect x="8" y="8" width="64" height="64" rx="6" fill="none" stroke="#2d4a2a" stroke-width="6"/>
-      <rect x="20" y="20" width="40" height="40" rx="4" fill="#2d4a2a"/>
-      <rect x="120" y="8" width="64" height="64" rx="6" fill="none" stroke="#2d4a2a" stroke-width="6"/>
-      <rect x="132" y="20" width="40" height="40" rx="4" fill="#2d4a2a"/>
-      <rect x="8" y="120" width="64" height="64" rx="6" fill="none" stroke="#2d4a2a" stroke-width="6"/>
-      <rect x="20" y="132" width="40" height="40" rx="4" fill="#2d4a2a"/>
-      <rect x="82" y="8" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="96" y="8" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="110" y="8" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="82" y="24" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="110" y="24" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="82" y="40" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="96" y="40" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="82" y="56" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="110" y="56" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="8" y="82" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="24" y="82" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="40" y="82" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="56" y="82" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="82" y="82" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="110" y="82" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="120" y="82" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="148" y="82" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="176" y="82" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="8" y="96" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="40" y="96" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="82" y="96" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="110" y="96" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="134" y="96" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="162" y="96" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="8" y="110" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="24" y="110" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="56" y="110" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="82" y="110" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="120" y="110" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="148" y="110" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="82" y="124" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="110" y="124" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="134" y="124" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="176" y="124" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="82" y="138" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="120" y="138" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="148" y="138" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="82" y="152" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="96" y="152" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="120" y="152" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="162" y="152" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="82" y="166" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="110" y="166" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="148" y="166" width="8" height="8" rx="2" fill="#2d4a2a"/>
-      <rect x="176" y="166" width="8" height="8" rx="2" fill="#2d4a2a"/>
-    </svg>
+    <svg id="qr-overlay-svg" viewBox="0 0 220 220" width="220" height="220" xmlns="http://www.w3.org/2000/svg"></svg>
     <div class="qr-scan-line" style="top:14px;"></div>
   </div>
   <div class="qr-id" id="qr-user-id">ID: ECO-2024-0892 · —</div>
@@ -2760,13 +2648,6 @@ function animateTruck() {
   const truck = document.getElementById('truck-g');
   if (!truck) return;
   const p = APP.truckPath;
-  function step() {
-    const pos = p[APP.truckIdx % p.length];
-    truck.setAttribute('transform', `translate(${pos.x},${pos.y})`);
-    APP.truckIdx++;
-    setTimeout(step, APP.truckIdx < p.length ? 700 : 5000 * (APP.truckIdx = 0) || 700);
-  }
-  // simpler loop
   let i = 0;
   setInterval(() => {
     const pos = p[i % p.length];
@@ -2909,13 +2790,11 @@ function simulateArrival() {
 /* ── QR OVERLAY ── */
 function openQR() {
   const o = document.getElementById('qr-overlay'); if (o) o.classList.add('show');
-  // Update nama pengguna dari data registrasi
+  const userName = (APP.user && APP.user.name) ? APP.user.name : 'Pengguna EcoLink';
+  const ticketId = APP.activeTicketId || 'ECO-2024-0892';
   const qrUserId = document.getElementById('qr-user-id');
-  if (qrUserId) {
-    const userName = (APP.user && APP.user.name) ? APP.user.name : 'Pengguna EcoLink';
-    const ticketId = APP.activeTicketId || 'ECO-2024-0892';
-    qrUserId.textContent = 'ID: ' + ticketId + ' · ' + userName;
-  }
+  if (qrUserId) qrUserId.textContent = 'ID: ' + ticketId + ' · ' + userName;
+  drawFakeQR('qr-overlay-svg', ticketId + '|' + userName);
 }
 function closeQR() {
   const o = document.getElementById('qr-overlay'); if (!o) return;
@@ -3236,6 +3115,8 @@ function updateLaporUI() {
   if (nb) nb.textContent = s===4 ? '✅ Konfirmasi & Kirim' : 'Lanjut →';
   // Bangun input berat saat masuk step 2
   if (s === 2) buildWeightInputs();
+  // Init Leaflet saat masuk step 3
+  if (s === 3) setTimeout(initLeafletMap, 120);
 }
 
 function toggleWaste(type) {
@@ -3593,13 +3474,7 @@ function konfirmasiQrisDonasi() {
   toast('📄 Mengunduh bukti donasi... (simulasi)');
 }
 
-/* ── FUNGSI LAMA — dipertahankan untuk kompatibilitas ── */
-function tutupQrisDonasi() {
-  showScreen('screen-tukar-poin');
-}
-function buildDonasiNominal() {}
-function pilihDonasi(n) { pilihNominalDonasi(n); }
-function konfirmasiDonasi() { konfirmasiQrisDonasi(); }
+
 
 function updateTukarState() {
   [5000,10000,20000,50000,100000].forEach(n => {
@@ -3858,12 +3733,8 @@ function unduhBukti() {
 }
 
 
-// Waste type images (base64)
-const WASTE_IMAGES = {
-  organik:   'file:///C:/Users/Ana%20Novianti/OneDrive/file%20proyek%20aplikasi/sampah%20organik.png',  
-  anorganik: 'file:///C:/Users/Ana%20Novianti/OneDrive/file%20proyek%20aplikasi/Gemini_Generated_Image_cc23r7cc23r7cc23.png',
-  b3:        'file:///C:/Users/Ana%20Novianti/OneDrive/file%20proyek%20aplikasi/sampah%20b3.png'
-};
+// Waste type fallback emojis
+const WASTE_EMOJI = { organik:'🌿', anorganik:'♻️', b3:'⚠️' };
 function addPhoto() {
   const wasteArr = [...APP.lapor.wastes];
   if (APP.lapor.photos >= wasteArr.length || APP.lapor.photos >= 3) {
@@ -3884,10 +3755,10 @@ function addPhoto() {
     t.style.overflow = 'hidden';
     t.style.borderRadius = '10px';
     t.style.cursor = 'default';
-    const img = document.createElement('img');
-    img.src = WASTE_IMAGES[wasteType] || '';
-    img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:10px;';
-    t.appendChild(img);
+    const span = document.createElement('span');
+    span.style.cssText = 'font-size:36px;';
+    span.textContent = WASTE_EMOJI[wasteType] || '📦';
+    t.appendChild(span);
     grid.appendChild(t);
   }
   // Remove previous "tambah" button if exists
@@ -3904,67 +3775,90 @@ function addPhoto() {
   toast(`📸 Foto ${APP.lapor.photos} ditambahkan`);
 }
 
-/* ── INTERACTIVE MAP ── */
-const MAP_STREETS = [
-  'Jl. Pejanggik','Jl. Selaparang','Jl. Langko','Jl. Majapahit','Jl. Catur Warga',
-  'Jl. Airlangga','Jl. Brawijaya','Jl. Diponegoro','Jl. Gajah Mada','Jl. Hasanuddin'
-];
-let mapPinX = 206, mapPinY = 112;
+/* ── INTERACTIVE MAP (Leaflet) ── */
+let _lmap = null, _lmarker = null, _geocodeTimer = null;
 
-function handleMapClick(e) {
-  const svg = document.getElementById('interactive-map-svg');
-  if (!svg) return;
-  const rect = svg.getBoundingClientRect();
-  const vbW = 390, vbH = 240;
-  const scaleX = vbW / rect.width;
-  const scaleY = vbH / rect.height;
-  const x = Math.round((e.clientX - rect.left) * scaleX);
-  const y = Math.round((e.clientY - rect.top) * scaleY);
-  movePinTo(x, y);
+function initLeafletMap() {
+  const container = document.getElementById('leaflet-map-container');
+  if (!container) return;
+  if (_lmap) { setTimeout(() => _lmap.invalidateSize(), 150); return; }
+
+  const defaultLat = -8.5833, defaultLng = 116.1167;
+  _lmap = L.map('leaflet-map-container', {
+    center: [defaultLat, defaultLng],
+    zoom: 16,
+    zoomControl: true,
+    attributionControl: true
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+  }).addTo(_lmap);
+
+  const pinIcon = L.divIcon({
+    html: '<div class="map-pin-drop"></div>',
+    iconSize: [28, 28],
+    iconAnchor: [11, 28],
+    className: ''
+  });
+
+  const userAddr = (APP.user && APP.user.address) ? APP.user.address : null;
+  _lmarker = L.marker([defaultLat, defaultLng], { icon: pinIcon, draggable: true }).addTo(_lmap);
+
+  _lmap.on('click', function(e) {
+    _lmarker.setLatLng(e.latlng);
+    reverseGeocode(e.latlng.lat, e.latlng.lng);
+  });
+  _lmarker.on('dragend', function(e) {
+    const p = e.target.getLatLng();
+    reverseGeocode(p.lat, p.lng);
+  });
+
+  if (userAddr) {
+    const infoEl = document.getElementById('map-pin-label');
+    if (infoEl) infoEl.textContent = '📍 ' + userAddr;
+    APP.lapor.location = userAddr;
+  } else {
+    reverseGeocode(defaultLat, defaultLng);
+  }
+  setTimeout(() => _lmap.invalidateSize(), 200);
 }
 
-function movePinTo(x, y) {
-  mapPinX = Math.max(18, Math.min(372, x));
-  mapPinY = Math.max(18, Math.min(222, y));
-  const shadow = document.getElementById('map-pin-shadow');
-  const outer  = document.getElementById('map-pin-outer');
-  const inner  = document.getElementById('map-pin-inner');
-  const line   = document.getElementById('map-pin-line');
-  if (shadow) { shadow.setAttribute('cx', mapPinX); shadow.setAttribute('cy', mapPinY + 10); }
-  if (outer)  { outer.setAttribute('cx', mapPinX);  outer.setAttribute('cy', mapPinY); }
-  if (inner)  { inner.setAttribute('cx', mapPinX);  inner.setAttribute('cy', mapPinY); }
-  if (line)   { line.setAttribute('x1', mapPinX); line.setAttribute('y1', mapPinY + 14); line.setAttribute('x2', mapPinX); line.setAttribute('y2', mapPinY + 20); }
-  // Generate fake address label
-  const noNum = Math.floor(Math.random() * 120) + 1;
-  const street = MAP_STREETS[Math.floor(mapPinY / 25) % MAP_STREETS.length];
-  const label = '📍 ' + street + ' No. ' + noNum ;
-  const infoEl = document.getElementById('map-pin-label');
-  if (infoEl) infoEl.textContent = label;
-  APP.lapor.location = street + ' No. ' + noNum;
-  // Pulse animation
-  if (outer) { outer.style.transition='r .1s'; outer.setAttribute('r','16'); setTimeout(()=>{ if(outer) outer.setAttribute('r','14'); },120); }
+function reverseGeocode(lat, lng) {
+  clearTimeout(_geocodeTimer);
+  _geocodeTimer = setTimeout(() => {
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=id`)
+      .then(r => r.json())
+      .then(data => {
+        const a = data.address || {};
+        let label = [a.road, a.house_number ? 'No.'+a.house_number : null, a.suburb || a.village, a.city || a.town || a.county]
+          .filter(Boolean).join(', ');
+        if (!label) label = data.display_name || ('Lat '+lat.toFixed(5)+', Lng '+lng.toFixed(5));
+        const infoEl = document.getElementById('map-pin-label');
+        if (infoEl) infoEl.textContent = '📍 ' + label;
+        APP.lapor.location = label;
+      })
+      .catch(() => {
+        const label = 'Koordinat: ' + lat.toFixed(5) + ', ' + lng.toFixed(5);
+        const infoEl = document.getElementById('map-pin-label');
+        if (infoEl) infoEl.textContent = '📍 ' + label;
+        APP.lapor.location = label;
+      });
+  }, 400);
 }
 
 function resetMapPin() {
-  // Pindahkan pin ke posisi tengah peta secara visual (tanpa menghasilkan alamat acak)
-  mapPinX = 206; mapPinY = 112;
-  const shadow = document.getElementById('map-pin-shadow');
-  const outer  = document.getElementById('map-pin-outer');
-  const inner  = document.getElementById('map-pin-inner');
-  const line   = document.getElementById('map-pin-line');
-  if (shadow) { shadow.setAttribute('cx', 206); shadow.setAttribute('cy', 122); }
-  if (outer)  { outer.setAttribute('cx', 206);  outer.setAttribute('cy', 112); }
-  if (inner)  { inner.setAttribute('cx', 206);  inner.setAttribute('cy', 112); }
-  if (line)   { line.setAttribute('x1', 206); line.setAttribute('y1', 126); line.setAttribute('x2', 206); line.setAttribute('y2', 132); }
-  // Gunakan alamat registrasi pengguna jika sudah tersedia
   const userAddr = (APP.user && APP.user.address) ? APP.user.address : 'Jl. Pejanggik No. 47';
   const infoEl = document.getElementById('map-pin-label');
   if (infoEl) infoEl.textContent = '📍 ' + userAddr;
   APP.lapor.location = userAddr;
+  if (_lmap && _lmarker) {
+    const pos = [-8.5833, 116.1167];
+    _lmarker.setLatLng(pos);
+    _lmap.panTo(pos);
+  }
 }
-
-function mapZoomIn() { toast('🔍 Perbesar peta'); }
-function mapZoomOut() { toast('🔎 Perkecil peta'); }
 
 /* ── CAL PICKERS ── */
 function selDay(el, day) {
