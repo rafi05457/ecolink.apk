@@ -980,6 +980,64 @@ textarea.input-field{resize:none;min-height:80px;}
         </div>
       </div>
 
+      <div style="height:10px;"></div>
+
+      <!-- Tempat Pembuangan Terdekat Button -->
+      <button onclick="toggleTempat()" id="btn-tempat-pembuangan" style="width:100%;background:rgba(52,76,61,.09);color:#1A2E22;border:1.5px solid rgba(52,76,61,.25);border-radius:14px;padding:15px 18px;font-size:14px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:0;transition:background .2s;">
+        <span style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:18px;">🗺️</span> Tempat Pembuangan Terdekat
+        </span>
+        <span id="tempat-chevron" style="transition:transform .35s;display:inline-block;color:#1A2E22;">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+        </span>
+      </button>
+
+      <!-- Tempat Pembuangan Accordion Panel -->
+      <div id="tempat-pembuangan-panel" style="max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1),opacity .4s;opacity:0;margin-bottom:0;">
+        <div style="background:var(--white);border:1.5px solid rgba(52,76,61,.18);border-top:none;border-radius:0 0 14px 14px;padding:16px 16px 18px;">
+
+          <!-- Intro label -->
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">📍 Lokasi di Sekitar Mataram</div>
+
+          <!-- Item 1: Bank Sampah -->
+          <div class="tempat-item" style="display:flex;align-items:flex-start;gap:12px;background:rgba(90,154,110,.07);border:1.5px solid rgba(90,154,110,.25);border-radius:14px;padding:14px;margin-bottom:10px;animation:fadeUp .35s ease both;animation-delay:.05s;">
+            <div style="width:42px;height:42px;border-radius:12px;background:#5A9A6E;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏦</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:800;color:#1A2E22;margin-bottom:4px;line-height:1.35;">Bank Sampah Lisan Kota Mataram</div>
+              <div style="font-size:11px;color:var(--muted);line-height:1.55;">Jl. Ireng Baru Blok G No.2, Jati Sela, Kec. Gunungsari, Kabupaten Lombok Barat, NTB</div>
+              <div style="margin-top:8px;">
+                <span style="display:inline-block;background:rgba(90,154,110,.15);color:#344C3D;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.03em;">♻️ Bank Sampah</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 2: TPA Regional -->
+          <div class="tempat-item" style="display:flex;align-items:flex-start;gap:12px;background:rgba(212,133,90,.07);border:1.5px solid rgba(212,133,90,.25);border-radius:14px;padding:14px;margin-bottom:10px;animation:fadeUp .35s ease both;animation-delay:.13s;">
+            <div style="width:42px;height:42px;border-radius:12px;background:#D4855A;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🏗️</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:800;color:#1A2E22;margin-bottom:4px;line-height:1.35;">TPA Regional Kebon Kongok</div>
+              <div style="font-size:11px;color:var(--muted);line-height:1.55;">Dusun Kebon Kongok, Suka Makmur, Kec. Gerung, Kabupaten Lombok Barat, NTB</div>
+              <div style="margin-top:8px;">
+                <span style="display:inline-block;background:rgba(212,133,90,.15);color:#8B4D2A;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.03em;">🗑️ TPA Regional</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Item 3: TPST Sandubaya -->
+          <div class="tempat-item" style="display:flex;align-items:flex-start;gap:12px;background:rgba(91,160,180,.07);border:1.5px solid rgba(91,160,180,.25);border-radius:14px;padding:14px;margin-bottom:4px;animation:fadeUp .35s ease both;animation-delay:.21s;">
+            <div style="width:42px;height:42px;border-radius:12px;background:#5BA0B4;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🔄</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:800;color:#1A2E22;margin-bottom:4px;line-height:1.35;">TPST Sandubaya Mataram</div>
+              <div style="font-size:11px;color:var(--muted);line-height:1.55;">Jl. TGH Islahuddin Bukhori, Mandalika, Kec. Sandubaya, Kota Mataram, NTB</div>
+              <div style="margin-top:8px;">
+                <span style="display:inline-block;background:rgba(91,160,180,.15);color:#2A6A7A;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.03em;">♻️ TPST</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -4022,6 +4080,32 @@ function toggleHubungiKami() {
     closeContactDetail('lokasi');
   } else {
     panel.style.maxHeight = panel.scrollHeight + 400 + 'px';
+    panel.style.opacity = '1';
+    chevron.style.transform = 'rotate(180deg)';
+    btn.style.borderRadius = '14px 14px 0 0';
+    btn.style.borderBottom = 'none';
+  }
+}
+
+function toggleTempat() {
+  const panel = document.getElementById('tempat-pembuangan-panel');
+  const chevron = document.getElementById('tempat-chevron');
+  const btn = document.getElementById('btn-tempat-pembuangan');
+  const isOpen = panel.style.maxHeight && panel.style.maxHeight !== '0px';
+  if (isOpen) {
+    panel.style.maxHeight = '0';
+    panel.style.opacity = '0';
+    chevron.style.transform = 'rotate(0deg)';
+    btn.style.borderRadius = '14px';
+    btn.style.borderBottom = '';
+  } else {
+    // Trigger item animations by re-setting animation
+    document.querySelectorAll('.tempat-item').forEach((el, i) => {
+      el.style.animation = 'none';
+      el.offsetHeight; // reflow
+      el.style.animation = '';
+    });
+    panel.style.maxHeight = panel.scrollHeight + 80 + 'px';
     panel.style.opacity = '1';
     chevron.style.transform = 'rotate(180deg)';
     btn.style.borderRadius = '14px 14px 0 0';
